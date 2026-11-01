@@ -97,437 +97,1219 @@ prediction = lda.predict(new_flower_scaled)
 
 print("\nPredicted Flower Species:", prediction[0])
 
-# AIM: Perform Linear Discriminant Analysis (LDA) on the Iris Dataset.
-#
-# Installation commands:
-# Windows:
+
+# ============================================================
+# AIM:
+# Perform Linear Discriminant Analysis (LDA) on the Iris Dataset
+# for Dimensionality Reduction and Classification.
+# ============================================================
+
+
+# ============================================================
+# 1. INSTALLATION AND EXECUTION COMMANDS
+# ============================================================
+
+# WINDOWS:
 # python -m pip install pandas matplotlib scikit-learn
 # python practical_lda.py
-#
-# Ubuntu/Linux:
+
+# UBUNTU / LINUX:
 # pip install pandas matplotlib scikit-learn
 # python3 practical_lda.py
-#
-# ------------------------------------------------------------
-# IMPORTING REQUIRED LIBRARIES
-# ------------------------------------------------------------
+
+# DATASET:
+# Iris.csv
+
+# The Iris.csv file must be present in the same folder
+# where the Python program is saved.
+
+
+# ============================================================
+# 2. IMPORTING REQUIRED LIBRARIES
+# ============================================================
 
 # import pandas as pd
-# Imports the Pandas library and gives it the short name 'pd'.
-# Pandas is used to load, store, manipulate and analyze tabular data.
-# It provides DataFrame structures to work with rows and columns.
+
+# Pandas is a Python library used for data manipulation,
+# data analysis and handling structured datasets.
+
+# It provides a DataFrame data structure that stores data
+# in tabular form, containing rows and columns.
+
+# pd is an alias (short name) for pandas.
+
+# Uses:
+# 1. Reading CSV files.
+# 2. Displaying dataset records.
+# 3. Removing unnecessary columns.
+# 4. Selecting input and output features.
+# 5. Creating new DataFrames.
+
 
 # import matplotlib.pyplot as plt
-# Imports the Pyplot module from Matplotlib with the short name 'plt'.
-# It is used to create graphs and visualize the LDA results.
+
+# Matplotlib is a Python library used for data visualization.
+
+# pyplot is a module of Matplotlib used to create graphs.
+
+# plt is an alias for matplotlib.pyplot.
+
+# Uses:
+# 1. Creating scatter plots.
+# 2. Displaying data distributions.
+# 3. Adding graph titles and labels.
+# 4. Displaying legends and grid lines.
+
 
 # from sklearn.model_selection import train_test_split
-# Imports train_test_split from Scikit-learn.
-# It divides the dataset into training data and testing data.
-# Training data is used to train the model.
-# Testing data is used to evaluate the model.
+
+# Scikit-learn is a Python machine learning library.
+
+# train_test_split() divides a dataset into training
+# and testing datasets.
+
+# Training data is used to train the machine learning model.
+
+# Testing data is used to evaluate the model's performance
+# on previously unseen observations.
+
 
 # from sklearn.preprocessing import StandardScaler
-# Imports StandardScaler from Scikit-learn.
-# It standardizes numerical features so they have a similar scale.
-# Standardization helps prevent large-valued features from dominating.
 
-# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-# Imports the LinearDiscriminantAnalysis algorithm.
-# LDA is a supervised machine learning algorithm.
-# It is used for classification and dimensionality reduction.
-# It tries to separate different classes by finding suitable directions.
+# StandardScaler is used for feature scaling.
 
-# from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-# Imports three evaluation metrics.
-# accuracy_score calculates the percentage of correct predictions.
-# classification_report displays precision, recall, F1-score and support.
-# confusion_matrix displays correct and incorrect predictions for each class.
-
-# ------------------------------------------------------------
-# LOADING THE DATASET
-# ------------------------------------------------------------
-
-# df = pd.read_csv("Iris.csv")
-# Reads the Iris.csv file and stores its contents in a DataFrame named df.
-# The dataset must be present in the same folder as this Python program.
-# The Iris dataset contains flower measurements and their species.
-# It generally contains 150 records, 4 measurement columns and 3 species.
-# The four features are sepal length, sepal width, petal length and petal width.
-
-# print("Original Iris Dataset:")
-# Displays the heading Original Iris Dataset on the screen.
-
-# print(df.head())
-# Displays the first five rows of the dataset.
-# head() is a Pandas function used to view the first five records by default.
-# It helps us check whether the dataset has loaded correctly.
-
-# ------------------------------------------------------------
-# DATA PREPROCESSING
-# ------------------------------------------------------------
-
-# df = df.drop(columns=["Id"], errors="ignore")
-# Removes the Id column from the dataset if it exists.
-# The Id column is only an identification number.
-# It does not provide useful information for predicting flower species.
-# columns=["Id"] specifies the column to remove.
-# errors="ignore" prevents an error if the Id column does not exist.
-
-# X = df.drop(columns=["Species"])
-# Stores the input features in X.
-# It removes the Species column because Species is the output to predict.
-# X contains four flower measurements:
-# SepalLengthCm, SepalWidthCm, PetalLengthCm and PetalWidthCm.
-# These are also called independent variables or input variables.
-
-# y = df["Species"]
-# Stores the target output column in y.
-# Species contains the actual flower categories.
-# These are Setosa, Versicolor and Virginica.
-# y is also called the dependent variable or target variable.
-
-# ------------------------------------------------------------
-# SPLITTING THE DATASET
-# ------------------------------------------------------------
-
-# X_train, X_test, y_train, y_test = train_test_split(
-# Divides the input features and target labels into training and testing sets.
-# X_train contains input features for training.
-# X_test contains input features for testing.
-# y_train contains correct species labels for training.
-# y_test contains correct species labels for testing.
-
-#     X,
-#     Passes all input features to the train_test_split function.
-
-#     y,
-#     Passes the target species labels to the function.
-
-#     test_size=0.2,
-#     Assigns 20% of the dataset to testing.
-#     The remaining 80% is used for training.
-#     For 150 records, this gives approximately 120 training and 30 testing records.
-
-#     random_state=42,
-#     Fixes the random number generator so the same split can be reproduced.
-#     The value 42 is an arbitrary fixed number.
-#     It helps obtain consistent results every time the program runs.
-
-#     stratify=y
-#     Maintains the same class proportions in training and testing datasets.
-#     It ensures that all three species are represented proportionally.
-#     For the standard Iris dataset, each species has 50 records.
-#     Therefore, approximately 40 records per species go into training
-#     and 10 records per species go into testing.
-
-# )
-# Closes the train_test_split function call.
-
-# ------------------------------------------------------------
-# FEATURE SCALING
-# ------------------------------------------------------------
-
-# scaler = StandardScaler()
-# Creates an object of the StandardScaler class.
-# It is used to standardize the input features.
-# Standardization converts features to a similar scale.
-# The formula is:
-# Z = (X - Mean) / Standard Deviation
-# After standardization, each feature has approximately:
+# It transforms numerical features so that:
 # Mean = 0
 # Standard Deviation = 1
 
+# Formula:
+# Z = (X - Mean) / Standard Deviation
+
+# Here:
+# X = Original feature value.
+# Mean = Mean of the feature.
+# Standard Deviation = Standard deviation of the feature.
+# Z = Standardized feature value.
+
+# Why is scaling required?
+# Features may have different ranges.
+# Scaling brings them to a common scale.
+# It prevents features with larger numerical values
+# from dominating features with smaller numerical values.
+
+
+# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# LinearDiscriminantAnalysis is the LDA algorithm
+# provided by the Scikit-learn library.
+
+# LDA stands for Linear Discriminant Analysis.
+
+# It is a SUPERVISED machine learning algorithm.
+
+# It is used for:
+# 1. Dimensionality reduction.
+# 2. Classification.
+# 3. Finding directions that separate different classes.
+
+# It uses both input features and their known class labels
+# to learn the differences between classes.
+
+
+# from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# These functions are used to evaluate the classification model.
+
+# accuracy_score():
+# Calculates the percentage of correctly predicted observations.
+
+# confusion_matrix():
+# Displays correct and incorrect predictions for each class.
+
+# classification_report():
+# Displays precision, recall, F1-score and support
+# for every target class.
+
+
+# ============================================================
+# 3. LOADING THE IRIS DATASET
+# ============================================================
+
+# df = pd.read_csv("Iris.csv")
+
+# pd.read_csv() is used to read a CSV file.
+
+# Iris.csv is the dataset filename.
+
+# df is the DataFrame variable in which the dataset is stored.
+
+# A DataFrame is a two-dimensional tabular data structure
+# containing rows and columns.
+
+# ABOUT THE IRIS DATASET:
+
+# The Iris dataset is a popular dataset used in machine learning
+# for classification and data analysis.
+
+# It contains measurements of three different Iris flower species.
+
+# Total observations = 150.
+# Total input features = 4.
+# Total target classes = 3.
+
+# FOUR INPUT FEATURES:
+
+# 1. SepalLengthCm:
+#    Length of the sepal measured in centimetres.
+
+# 2. SepalWidthCm:
+#    Width of the sepal measured in centimetres.
+
+# 3. PetalLengthCm:
+#    Length of the petal measured in centimetres.
+
+# 4. PetalWidthCm:
+#    Width of the petal measured in centimetres.
+
+# THREE TARGET CLASSES:
+
+# 1. Iris-setosa
+# 2. Iris-versicolor
+# 3. Iris-virginica
+
+# Each species contains 50 observations in the standard dataset.
+
+
+# print("Original Iris Dataset:")
+# print(df.head())
+
+# print() displays information on the screen.
+
+# df.head() displays the first five rows of the dataset.
+
+# It helps us:
+# 1. Check whether the dataset loaded successfully.
+# 2. Understand the dataset structure.
+# 3. Identify column names.
+# 4. Observe the values stored in each column.
+
+# EXPECTED OUTPUT:
+
+# Displays the first five records of the Iris dataset
+# with flower measurements and their corresponding species.
+
+
+# ============================================================
+# 4. DATA PREPROCESSING
+# ============================================================
+
+# df = df.drop(columns=["Id"], errors="ignore")
+
+# drop() removes unnecessary rows or columns from a DataFrame.
+
+# columns=["Id"] specifies that the Id column must be removed.
+
+# The Id column is only a unique identification number.
+# It does not provide useful information for predicting
+# the flower species.
+
+# errors="ignore" prevents an error if the Id column
+# is not available in the dataset.
+
+# WHY REMOVE ID?
+
+# Identification numbers do not represent actual flower
+# characteristics and should not be used as input features.
+
+
+# X = df.drop(columns=["Species"])
+
+# X represents the independent variables or input features.
+
+# The Species column is removed because it is the target variable.
+
+# X contains four input features:
+# 1. Sepal Length.
+# 2. Sepal Width.
+# 3. Petal Length.
+# 4. Petal Width.
+
+# These measurements are given to the machine learning model
+# to predict the flower species.
+
+# In machine learning:
+# X = Input features.
+# y = Target variable.
+
+
+# y = df["Species"]
+
+# y represents the dependent variable or target variable.
+
+# It contains the actual species names of the flowers.
+
+# Possible values:
+# Iris-setosa.
+# Iris-versicolor.
+# Iris-virginica.
+
+# The model learns the relationship between X and y
+# during the training process.
+
+
+# ============================================================
+# 5. SPLITTING DATA INTO TRAINING AND TESTING SETS
+# ============================================================
+
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X,
+#     y,
+#     test_size=0.2,
+#     random_state=42,
+#     stratify=y
+# )
+
+# train_test_split() divides the dataset into training
+# and testing datasets.
+
+# PARAMETERS:
+
+# X:
+# Contains the input features.
+
+# y:
+# Contains the actual species labels.
+
+# test_size=0.2:
+# Allocates 20% of the observations for testing.
+# The remaining 80% is used for training.
+
+# Total observations = 150.
+
+# Training observations = 80% of 150 = 120.
+
+# Testing observations = 20% of 150 = 30.
+
+# random_state=42:
+# Fixes the random seed so that the same data split
+# is generated whenever the program is executed.
+
+# 42 is simply a selected random seed value.
+
+# stratify=y:
+# Maintains the proportion of each species in both
+# training and testing datasets.
+
+# Since each species has 50 observations:
+
+# Training:
+# Iris-setosa = 40.
+# Iris-versicolor = 40.
+# Iris-virginica = 40.
+
+# Testing:
+# Iris-setosa = 10.
+# Iris-versicolor = 10.
+# Iris-virginica = 10.
+
+# FOUR OUTPUT VARIABLES:
+
+# X_train:
+# Input features used for training the model.
+
+# X_test:
+# Input features used for testing the model.
+
+# y_train:
+# Actual species labels used during training.
+
+# y_test:
+# Actual species labels used for model evaluation.
+
+# WHY SPLIT DATA?
+
+# If we evaluate the model using the same data on which
+# it was trained, the performance may appear misleading.
+
+# Separate testing data helps us check whether the model
+# can correctly classify new, unseen observations.
+
+
+# ============================================================
+# 6. FEATURE SCALING USING STANDARD SCALER
+# ============================================================
+
+# scaler = StandardScaler()
+
+# Creates an object of the StandardScaler class.
+
+# StandardScaler standardizes the numerical input features.
+
+# FORMULA:
+
+# Z = (X - Mean) / Standard Deviation
+
+# After standardization:
+# Mean is approximately 0.
+# Standard deviation is approximately 1.
+
+# WHY STANDARDIZATION?
+
+# Different features may have different numerical ranges.
+
+# For example:
+# Sepal length may have values around 4 to 8.
+# Petal width may have values around 0 to 3.
+
+# Standardization puts these features on a comparable scale.
+
+# It also helps numerical algorithms work with
+# consistently scaled input features.
+
+
 # X_train_scaled = scaler.fit_transform(X_train)
-# fit() calculates the mean and standard deviation from training data.
-# transform() uses those values to standardize the training data.
-# fit_transform() performs both operations together.
-# The result is stored in X_train_scaled.
-# We calculate scaling values only from training data to avoid data leakage.
+
+# fit_transform() performs two operations.
+
+# STEP 1: fit()
+
+# Calculates the mean and standard deviation
+# of each feature using the training dataset.
+
+# STEP 2: transform()
+
+# Uses the calculated mean and standard deviation
+# to standardize the training dataset.
+
+# X_train_scaled stores the standardized training features.
+
+# IMPORTANT:
+# Scaling parameters are learned only from training data.
+
+# This prevents DATA LEAKAGE.
+
 
 # X_test_scaled = scaler.transform(X_test)
-# Standardizes the testing data using the training data's mean and standard deviation.
-# We use transform() instead of fit_transform().
-# This ensures that testing data does not influence the training process.
-# The standardized testing data is stored in X_test_scaled.
 
-# ------------------------------------------------------------
-# APPLYING LINEAR DISCRIMINANT ANALYSIS
-# ------------------------------------------------------------
+# transform() standardizes the testing dataset.
+
+# It uses the mean and standard deviation already calculated
+# from the training dataset.
+
+# WHY NOT fit_transform() ON TEST DATA?
+
+# The testing dataset must not influence the training process.
+
+# Using its own mean and standard deviation would introduce
+# information from the testing data into preprocessing.
+
+# Both training and testing datasets must use
+# the same scaling parameters.
+
+
+# ============================================================
+# 7. APPLYING LINEAR DISCRIMINANT ANALYSIS (LDA)
+# ============================================================
 
 # lda = LinearDiscriminantAnalysis(n_components=2)
-# Creates an LDA model and stores it in the variable lda.
-# n_components=2 means that we want to reduce the data to two dimensions.
-# The Iris dataset has three classes.
-# Maximum LDA components = Number of classes - 1.
-# Therefore, maximum components = 3 - 1 = 2.
-# LDA tries to maximize separation between different species.
-# It is a supervised technique because it uses the known species labels.
+
+# Creates an LDA model.
+
+# LDA is a supervised dimensionality reduction
+# and classification algorithm.
+
+# SUPERVISED LEARNING:
+
+# Supervised learning means the algorithm learns using
+# input data and already-known output labels.
+
+# In this practical:
+# Input = Four flower measurements.
+# Output = Three flower species.
+
+# MAIN OBJECTIVE OF LDA:
+
+# LDA finds new directions that maximize the separation
+# between different classes and minimize the spread
+# of observations belonging to the same class.
+
+# TWO IMPORTANT CONCEPTS:
+
+# 1. WITHIN-CLASS SCATTER:
+
+# It measures how much observations belonging to the same
+# class are spread around their class mean.
+
+# Lower within-class scatter is desirable.
+
+# 2. BETWEEN-CLASS SCATTER:
+
+# It measures how far apart the means of different classes are.
+
+# Higher between-class scatter is desirable.
+
+# LDA tries to maximize the ratio:
+
+# Between-Class Scatter / Within-Class Scatter
+
+# This helps separate different classes effectively.
+
+
+# n_components=2:
+
+# Specifies the number of new dimensions to retain.
+
+# Original dimensions = 4.
+
+# Reduced dimensions = 2.
+
+# IMPORTANT FORMULA:
+
+# Maximum number of LDA components = Number of classes - 1.
+
+# Here:
+# Number of classes = 3.
+
+# Maximum components = 3 - 1 = 2.
+
+# Therefore, we can retain a maximum of two LDA components.
+
+# These components are:
+# 1. Linear Discriminant 1 (LD1).
+# 2. Linear Discriminant 2 (LD2).
+
+# LD1 and LD2 are new features formed as linear combinations
+# of the original four input features.
+
 
 # X_train_lda = lda.fit_transform(X_train_scaled, y_train)
-# fit() trains the LDA model using standardized training features and their labels.
-# transform() converts the training data into two new LDA components.
-# fit_transform() performs both operations together.
-# X_train_lda contains the reduced two-dimensional training data.
-# The two new dimensions are called Linear Discriminant 1 and 2.
-# LDA tries to keep different flower species as separate as possible.
+
+# fit_transform() performs two operations.
+
+# STEP 1: fit()
+
+# Trains the LDA model using standardized training features
+# and their corresponding actual species labels.
+
+# The model learns the directions that best separate
+# the three flower species.
+
+# STEP 2: transform()
+
+# Transforms the original four-dimensional training data
+# into a two-dimensional representation.
+
+# Original features = 4.
+
+# New LDA components = 2.
+
+# X_train_lda contains:
+# First column = LD1.
+# Second column = LD2.
+
+# PURPOSE:
+
+# Reduces the number of features while preserving
+# information useful for class separation.
+
+# The two-dimensional representation is also useful
+# for visualizing the different flower species.
+
+
+# ============================================================
+# 8. PREDICTING TESTING DATA
+# ============================================================
 
 # y_pred = lda.predict(X_test_scaled)
-# Uses the trained LDA model to predict the species of testing flowers.
-# X_test_scaled contains standardized testing measurements.
-# predict() returns the predicted species for every testing record.
-# The predicted labels are stored in y_pred.
 
-# ------------------------------------------------------------
-# DISPLAYING ACTUAL AND PREDICTED SPECIES
-# ------------------------------------------------------------
+# predict() uses the already-trained LDA model
+# to predict the species of testing observations.
+
+# X_test_scaled contains 30 unseen flower observations.
+
+# The model examines their four standardized measurements
+# and predicts one of the three species.
+
+# y_pred stores the predicted species labels.
+
+# IMPORTANT DIFFERENCE:
+
+# fit():
+# Learns the model from the training data.
+
+# transform():
+# Converts the input features into new dimensions.
+
+# fit_transform():
+# Performs both fitting and transformation.
+
+# predict():
+# Predicts the output class for given observations.
+
+
+# ============================================================
+# 9. DISPLAYING ACTUAL AND PREDICTED SPECIES
+# ============================================================
 
 # print("\nActual Species:")
-# Displays the heading Actual Species.
-# \n moves the output to a new line before printing the heading.
-
 # print(y_test.values)
-# Displays the actual species labels from the testing dataset.
-# values converts the Pandas Series into a NumPy array.
+
+# Displays the actual species labels of testing observations.
+
+# y_test contains the correct answers from the original dataset.
+
+# values converts the pandas Series into a NumPy array.
+
+# There are 30 actual species labels.
+
+# These are used to check the correctness of predictions.
+
 
 # print("\nPredicted Species:")
-# Displays the heading Predicted Species on a new line.
-
 # print(y_pred)
-# Displays the species predicted by the trained LDA model.
-# We can compare these predictions with the actual species labels.
 
-# ------------------------------------------------------------
-# MODEL EVALUATION
-# ------------------------------------------------------------
+# Displays the species predicted by the trained LDA model.
+
+# Each predicted label corresponds to the same-position
+# observation in the actual species array.
+
+# If actual and predicted labels match:
+# The prediction is CORRECT.
+
+# If actual and predicted labels differ:
+# The prediction is INCORRECT.
+
+
+# ============================================================
+# 10. CALCULATING ACCURACY
+# ============================================================
 
 # print("\nAccuracy:", accuracy_score(y_test, y_pred) * 100, "%")
-# Calculates and displays the model's accuracy as a percentage.
-# accuracy_score() compares actual labels with predicted labels.
-# Formula:
-# Accuracy = (Number of Correct Predictions / Total Predictions) * 100
-# Multiplication by 100 converts the accuracy into a percentage.
-# Higher accuracy generally indicates better classification performance.
+
+# accuracy_score() calculates the overall classification accuracy.
+
+# It compares:
+# y_test = Actual species labels.
+# y_pred = Predicted species labels.
+
+# FORMULA:
+
+# Accuracy =
+# (Number of Correct Predictions / Total Predictions) * 100
+
+# EXAMPLE:
+
+# Total testing observations = 30.
+
+# If 29 predictions are correct:
+
+# Accuracy = (29 / 30) * 100.
+
+# Accuracy = 96.67%.
+
+# The actual accuracy is calculated by the program.
+
+# INTERPRETATION:
+
+# Higher accuracy indicates that the model correctly
+# classified a larger percentage of testing observations.
+
+# Accuracy alone does not explain every type of classification
+# error, so we also calculate the confusion matrix
+# and classification report.
+
+
+# ============================================================
+# 11. CONFUSION MATRIX
+# ============================================================
 
 # print("\nConfusion Matrix:")
-# Displays the heading Confusion Matrix.
-
 # print(confusion_matrix(y_test, y_pred))
-# Creates and displays the confusion matrix.
-# It compares actual species with predicted species.
-# Rows represent actual classes.
-# Columns represent predicted classes.
-# Diagonal values represent correctly classified records.
-# Values outside the diagonal represent incorrect classifications.
-# For three species, the confusion matrix has 3 rows and 3 columns.
+
+# confusion_matrix() compares actual class labels
+# with predicted class labels.
+
+# It displays correct and incorrect predictions
+# for each flower species.
+
+# Since there are three species, the confusion matrix
+# contains three rows and three columns.
+
+# DEFAULT ARRANGEMENT:
+
+# Rows = Actual classes.
+# Columns = Predicted classes.
+
+# EXAMPLE CONFUSION MATRIX:
+
+# [[10  0  0]
+#  [ 0  9  1]
+#  [ 0  0 10]]
+
+# EXPLANATION:
+
+# FIRST ROW:
+
+# 10 Iris-setosa flowers were correctly classified
+# as Iris-setosa.
+
+# SECOND ROW:
+
+# 9 Iris-versicolor flowers were correctly classified.
+
+# 1 Iris-versicolor flower was incorrectly classified
+# as Iris-virginica.
+
+# THIRD ROW:
+
+# 10 Iris-virginica flowers were correctly classified.
+
+# DIAGONAL ELEMENTS:
+
+# Values on the main diagonal represent correct predictions.
+
+# OFF-DIAGONAL ELEMENTS:
+
+# Values outside the main diagonal represent incorrect predictions.
+
+# PERFECT CONFUSION MATRIX:
+
+# All values should be on the main diagonal.
+# All remaining values should be zero.
+
+# NOTE:
+# The above matrix is only an example.
+# Actual values depend on the model's predictions.
+
+
+# ============================================================
+# 12. CLASSIFICATION REPORT
+# ============================================================
 
 # print("\nClassification Report:")
-# Displays the heading Classification Report.
-
 # print(classification_report(y_test, y_pred))
-# Displays the detailed classification performance.
-# Precision = Correct Positive Predictions / Total Positive Predictions.
-# Recall = Correct Positive Predictions / Actual Positive Records.
-# F1-score = 2 * (Precision * Recall) / (Precision + Recall).
-# Support = Number of actual records belonging to each species.
-# Macro average calculates the unweighted average across classes.
-# Weighted average calculates the average considering the number of records
-# belonging to each class.
-# Higher precision, recall and F1-score generally indicate better performance.
 
-# ------------------------------------------------------------
-# VISUALIZATION OF LDA RESULTS
-# ------------------------------------------------------------
+# classification_report() displays the performance
+# of the classification model.
+
+# It provides four important evaluation metrics:
+# 1. Precision.
+# 2. Recall.
+# 3. F1-score.
+# 4. Support.
+
+
+# PRECISION:
+
+# Precision tells us how many observations predicted
+# as a particular class actually belong to that class.
+
+# FORMULA:
+
+# Precision = TP / (TP + FP)
+
+# TP = True Positive.
+# FP = False Positive.
+
+# Example:
+# If the model predicts 10 flowers as Iris-setosa
+# and all 10 actually belong to Iris-setosa:
+
+# Precision = 10 / 10 = 1.00.
+
+
+# RECALL:
+
+# Recall tells us how many actual observations of a class
+# were correctly identified by the model.
+
+# FORMULA:
+
+# Recall = TP / (TP + FN)
+
+# FN = False Negative.
+
+# Example:
+# If there are 10 actual Iris-setosa flowers
+# and the model correctly identifies all 10:
+
+# Recall = 10 / 10 = 1.00.
+
+
+# F1-SCORE:
+
+# F1-score is the harmonic mean of precision and recall.
+
+# It provides a balance between precision and recall.
+
+# FORMULA:
+
+# F1-score = 2 * (Precision * Recall) /
+#            (Precision + Recall)
+
+# A higher F1-score indicates better classification performance.
+
+
+# SUPPORT:
+
+# Support represents the actual number of observations
+# belonging to a particular class in the testing dataset.
+
+# In this practical:
+
+# Iris-setosa = 10.
+# Iris-versicolor = 10.
+# Iris-virginica = 10.
+
+
+# ACCURACY:
+
+# Represents the overall proportion of correctly
+# classified testing observations.
+
+
+# MACRO AVERAGE:
+
+# Calculates the average metric across all classes.
+
+# Every class receives equal importance,
+# regardless of the number of observations in that class.
+
+
+# WEIGHTED AVERAGE:
+
+# Calculates the average metric by considering
+# the number of observations in each class.
+
+# Since the Iris dataset is balanced,
+# macro and weighted averages may be similar.
+
+
+# ============================================================
+# 13. VISUALIZATION USING A SCATTER PLOT
+# ============================================================
 
 # plt.figure(figsize=(8, 6))
-# Creates a new graph with width 8 inches and height 6 inches.
-# figsize controls the size of the graph.
+
+# figure() creates a new graph.
+
+# figsize=(8, 6) specifies the dimensions of the graph.
+
+# Width = 8 inches.
+# Height = 6 inches.
+
+# A larger graph makes the observations easier to understand.
+
 
 # for species in y.unique():
-# Starts a loop that visits every unique flower species in the target column.
-# unique() returns the different species without repeating them.
-# The loop runs once for Setosa, Versicolor and Virginica.
 
-#     plt.scatter(
-#     Creates a scatter plot for the current flower species.
-#     A scatter plot displays data points using dots.
+# unique() returns all different species present
+# in the target column.
 
-#         X_train_lda[y_train.values == species, 0],
-#         Selects the first LDA component for the current species.
-#         Column index 0 represents Linear Discriminant 1.
-#         y_train.values == species selects only the records of that species.
+# Three unique species:
+# Iris-setosa.
+# Iris-versicolor.
+# Iris-virginica.
 
-#         X_train_lda[y_train.values == species, 1],
-#         Selects the second LDA component for the current species.
-#         Column index 1 represents Linear Discriminant 2.
-#         These values are displayed on the vertical axis.
+# The for loop processes one species at a time.
 
-#         label=species
-#         Assigns the current species name as the label in the graph legend.
+# This allows us to plot each species separately.
 
-#     )
-#     Closes the scatter plot function call.
+
+# plt.scatter(
+#     X_train_lda[y_train.values == species, 0],
+#     X_train_lda[y_train.values == species, 1],
+#     label=species
+# )
+
+# scatter() creates a scatter plot.
+
+# A scatter plot represents observations using individual points.
+
+# FIRST ARGUMENT:
+
+# X_train_lda[y_train.values == species, 0]
+
+# Selects the first LDA component (LD1)
+# for observations belonging to the current species.
+
+# This represents the horizontal X-axis.
+
+# SECOND ARGUMENT:
+
+# X_train_lda[y_train.values == species, 1]
+
+# Selects the second LDA component (LD2)
+# for observations belonging to the current species.
+
+# This represents the vertical Y-axis.
+
+# CONDITION:
+
+# y_train.values == species
+
+# Checks which training observations belong to the
+# current species being processed by the loop.
+
+# label=species:
+
+# Assigns the species name to the plotted points.
+
+# Each species gets a separate label in the graph legend.
+
+# GRAPH PURPOSE:
+
+# To visualize how well LDA separates the three flower species
+# after reducing the original four features into two dimensions.
+
 
 # plt.xlabel("Linear Discriminant 1")
-# Sets the horizontal axis label to Linear Discriminant 1.
+
+# Sets the horizontal axis label.
+
+# LD1 represents the first new feature generated by LDA.
+
+# It is a linear combination of the original four measurements.
+
 
 # plt.ylabel("Linear Discriminant 2")
-# Sets the vertical axis label to Linear Discriminant 2.
+
+# Sets the vertical axis label.
+
+# LD2 represents the second new feature generated by LDA.
+
+# It is another linear combination of the original four measurements.
+
 
 # plt.title("LDA - Iris Dataset")
+
 # Sets the title of the graph.
 
+# It indicates that the graph represents LDA results
+# for the Iris flower dataset.
+
+
 # plt.legend()
+
 # Displays the legend containing the names of the three species.
 
+# It helps identify which points belong to each flower species.
+
+
 # plt.grid(True)
-# Displays grid lines in the graph.
-# True enables the grid.
+
+# Adds horizontal and vertical grid lines.
+
+# Grid lines help us understand the position of points
+# in the scatter plot.
+
 
 # plt.show()
-# Displays the completed LDA scatter plot.
-# Each species is represented using a separate group of points.
-# Well-separated groups indicate that LDA has separated the classes effectively.
-# Some overlap between Versicolor and Virginica may occur.
 
-# ------------------------------------------------------------
-# PREDICTING THE SPECIES OF A NEW FLOWER
-# ------------------------------------------------------------
+# Displays the completed scatter plot.
+
+
+# ============================================================
+# 14. DETAILED GRAPH INTERPRETATION
+# ============================================================
+
+# GRAPH TYPE:
+# Scatter Plot.
+
+# X-AXIS:
+# Linear Discriminant 1 (LD1).
+
+# Y-AXIS:
+# Linear Discriminant 2 (LD2).
+
+# EACH POINT:
+# Represents one flower observation from the training dataset.
+
+# DIFFERENT COLOURS:
+# Represent different Iris flower species.
+
+# CLUSTER:
+# A group of points located close to one another.
+
+# CLASS SEPARATION:
+# Indicates how effectively different species are separated
+# by the LDA algorithm.
+
+# EXPECTED OBSERVATIONS:
+
+# 1. Iris-setosa is generally clearly separated
+#    from the other two species.
+
+# 2. Iris-versicolor and Iris-virginica may show some overlap.
+
+# 3. Less overlap indicates better class separation.
+
+# 4. Separate clusters indicate that LDA has found
+#    useful discriminant directions.
+
+# 5. Overlapping clusters indicate that some flowers
+#    have similar measurements.
+
+# IMPORTANT:
+# The graph displays only training observations.
+
+# Testing observations are not plotted in this graph.
+
+# The graph is used for visualization,
+# whereas the testing dataset is used for model evaluation.
+
+
+# ============================================================
+# 15. PREDICTING THE SPECIES OF A NEW FLOWER
+# ============================================================
 
 # print("\nEnter Flower Measurements to Predict Species:")
-# Displays a message asking the user to enter flower measurements.
+
+# Displays a message asking the user to enter
+# the measurements of a new flower.
+
+# This demonstrates how a trained machine learning model
+# can classify a new, previously unseen observation.
+
 
 # sepal_length = float(input("Enter Sepal Length (cm): "))
+
 # input() accepts the sepal length entered by the user.
+
 # float() converts the entered value into a decimal number.
-# The value is stored in the variable sepal_length.
-# Sepal length is measured in centimeters.
+
+# Example:
+# 5.1
+
 
 # sepal_width = float(input("Enter Sepal Width (cm): "))
-# Accepts the sepal width from the user.
-# float() converts the input into a decimal number.
-# The value is stored in sepal_width.
+
+# Accepts the sepal width of the new flower.
+
+# Example:
+# 3.5
+
 
 # petal_length = float(input("Enter Petal Length (cm): "))
-# Accepts the petal length from the user.
-# float() converts the input into a decimal number.
-# The value is stored in petal_length.
+
+# Accepts the petal length of the new flower.
+
+# Example:
+# 1.4
+
 
 # petal_width = float(input("Enter Petal Width (cm): "))
-# Accepts the petal width from the user.
-# float() converts the input into a decimal number.
-# The value is stored in petal_width.
+
+# Accepts the petal width of the new flower.
+
+# Example:
+# 0.2
+
+# IMPORTANT:
+# All measurements must be entered in centimetres.
+# The order must match the original input features.
+
 
 # new_flower = pd.DataFrame(
-# Creates a new Pandas DataFrame containing the measurements of one flower.
-# A DataFrame stores data in rows and columns.
-
 #     [[sepal_length, sepal_width, petal_length, petal_width]],
-# Stores the four measurements in a single row.
-# The outer list represents the row.
-# The inner list contains the four feature values.
-
 #     columns=X.columns
-# Assigns the same column names and order used by the training dataset.
-# This ensures that the new flower measurements match the model's input features.
-
 # )
-# Closes the DataFrame function call.
+
+# pd.DataFrame() creates a new DataFrame.
+
+# It stores the four measurements entered by the user.
+
+# [[...]] represents one flower observation
+# containing four feature values.
+
+# columns=X.columns assigns the same feature names
+# and feature order used during model training.
+
+# This is important because the model expects
+# the same four input features in the same order.
+
+# The new DataFrame contains:
+# 1. Sepal Length.
+# 2. Sepal Width.
+# 3. Petal Length.
+# 4. Petal Width.
+
 
 # new_flower_scaled = scaler.transform(new_flower)
+
 # Standardizes the new flower measurements.
-# It uses the same mean and standard deviation calculated from training data.
-# We must not fit the scaler again on the new flower.
-# The standardized measurements are stored in new_flower_scaled.
+
+# transform() uses the mean and standard deviation
+# previously calculated from the training dataset.
+
+# We do not use fit_transform() here.
+
+# WHY?
+
+# The new flower must be processed using the same scaling
+# parameters used during model training.
+
+# This ensures consistency between training data
+# and new input data.
+
 
 # prediction = lda.predict(new_flower_scaled)
-# Passes the standardized new flower measurements to the trained LDA model.
-# predict() identifies the most likely flower species.
-# The predicted species is stored in prediction.
+
+# predict() uses the trained LDA model to classify
+# the new flower.
+
+# The model receives four standardized measurements.
+
+# It predicts one of the three flower species.
+
+# prediction stores the predicted class label.
+
 
 # print("\nPredicted Flower Species:", prediction[0])
-# Displays the predicted species of the new flower.
-# prediction[0] accesses the first prediction because only one flower was entered.
 
-# ------------------------------------------------------------
-# CONCLUSION
-# ------------------------------------------------------------
+# Displays the predicted flower species.
 
-# Linear Discriminant Analysis was successfully applied to the Iris dataset.
-# The dataset was divided into training and testing sets.
-# The features were standardized using StandardScaler.
-# LDA reduced the four input features into two linear discriminant components.
-# The model classified the flower species and its performance was evaluated
-# using accuracy, confusion matrix and classification report.
-# A scatter plot was generated to visualize the separation between species.
-# Finally, the trained model was used to predict the species of a new flower.
+# prediction[0] selects the first prediction
+# because the user has entered only one flower.
 
-# ------------------------------------------------------------
-# IMPORTANT VIVA QUESTIONS
-# ------------------------------------------------------------
+# POSSIBLE OUTPUTS:
+
+# Iris-setosa.
+# Iris-versicolor.
+# Iris-virginica.
+
+# The result depends on the measurements entered by the user.
+
+
+# ============================================================
+# 16. EXPECTED OUTPUT EXPLANATION
+# ============================================================
+
+# OUTPUT 1: ORIGINAL DATASET
+
+# Displays the first five records of Iris.csv.
+
+# OUTPUT 2: ACTUAL SPECIES
+
+# Displays the actual species labels of the 30 testing flowers.
+
+# OUTPUT 3: PREDICTED SPECIES
+
+# Displays the species predicted by the LDA model.
+
+# OUTPUT 4: ACCURACY
+
+# Displays the percentage of correctly classified
+# testing observations.
+
+# OUTPUT 5: CONFUSION MATRIX
+
+# Displays correct and incorrect predictions
+# for all three species.
+
+# OUTPUT 6: CLASSIFICATION REPORT
+
+# Displays precision, recall, F1-score, support,
+# accuracy, macro average and weighted average.
+
+# OUTPUT 7: SCATTER PLOT
+
+# Displays the two-dimensional representation
+# of the training observations after LDA.
+
+# OUTPUT 8: NEW FLOWER PREDICTION
+
+# Accepts four flower measurements from the user
+# and predicts the corresponding species.
+
+
+# ============================================================
+# 17. IMPORTANT LDA VIVA QUESTIONS AND ANSWERS
+# ============================================================
 
 # Q1. What is LDA?
-# Ans: LDA stands for Linear Discriminant Analysis.
-# It is a supervised machine learning technique used for classification
-# and dimensionality reduction.
+
+# Ans:
+# LDA stands for Linear Discriminant Analysis.
+# It is a supervised machine learning algorithm used
+# for dimensionality reduction and classification.
+
 
 # Q2. Is LDA supervised or unsupervised?
-# Ans: LDA is supervised because it uses class labels during training.
 
-# Q3. What is the main objective of LDA?
-# Ans: Its main objective is to maximize the separation between different classes
-# while minimizing the spread of data within each class.
+# Ans:
+# LDA is a supervised learning algorithm because
+# it uses known class labels during training.
 
-# Q4. What is dimensionality reduction?
-# Ans: Dimensionality reduction is the process of reducing the number of
-# input features while preserving useful information.
+
+# Q3. What is dimensionality reduction?
+
+# Ans:
+# Dimensionality reduction is the process of reducing
+# the number of input features while retaining
+# important information from the original dataset.
+
+
+# Q4. What is the main objective of LDA?
+
+# Ans:
+# To maximize the separation between different classes
+# and minimize the spread within the same class.
+
 
 # Q5. What is the difference between PCA and LDA?
-# Ans: PCA is an unsupervised technique that finds directions of maximum variance.
-# LDA is a supervised technique that finds directions that best separate classes.
 
-# Q6. Why do we use StandardScaler?
-# Ans: It standardizes numerical features so they have approximately
-# zero mean and unit standard deviation.
+# Ans:
+# PCA is an unsupervised dimensionality reduction technique.
+# It finds directions of maximum overall variance.
 
-# Q7. Why do we use train_test_split?
-# Ans: It divides the dataset into training and testing data.
-# Training data trains the model and testing data evaluates it.
+# LDA is a supervised dimensionality reduction technique.
+# It finds directions that best separate different classes.
 
-# Q8. What is the purpose of random_state=42?
-# Ans: It makes the random splitting reproducible.
 
-# Q9. What is the purpose of stratify=y?
-# Ans: It maintains the class proportions in training and testing data.
+# Q6. How many features are present in the Iris dataset?
 
-# Q10. What is a confusion matrix?
-# Ans: It is a table used to compare actual class labels with predicted labels.
+# Ans:
+# Four input features.
 
-# Q11. What is accuracy?
-# Ans: Accuracy is the percentage of correctly classified records.
 
-# Q12. What are precision and recall?
-# Ans: Precision measures how many predicted positive records are correct.
-# Recall measures how many actual positive records are correctly identified.
+# Q7. How many classes are present in the Iris dataset?
 
-# Q13. Why is n_components=2 used?
-# Ans: The Iris dataset has three classes.
-# The maximum number of LDA components is classes minus one.
-# Therefore, the maximum number of components is 3 - 1 = 2.
+# Ans:
+# Three classes.
 
-# Q14. What is the Iris dataset?
-# Ans: It is a standard dataset containing measurements of three iris flower
-# species: Setosa, Versicolor and Virginica.
 
-# Q15. What is the purpose of plt.scatter()?
-# Ans: It creates a scatter plot to visualize the relationship between
-# two numerical variables.
+# Q8. Why is n_components set to 2?
 
-# Q16. What is the difference between fit_transform() and transform()?
-# Ans: fit_transform() learns the required parameters and transforms the data.
-# transform() uses already learned parameters to transform new data.
+# Ans:
+# Because the maximum number of LDA components is
+# the number of classes minus one.
 
-# Q17. Why do we use prediction[0]?
-# Ans: It accesses the first predicted result because only one new flower
-# is entered by the user.
+# Maximum components = 3 - 1 = 2.
 
+
+# Q9. What is LD1?
+
+# Ans:
+# LD1 is the first linear discriminant component.
+# It represents a new feature that helps separate classes.
+
+
+# Q10. What is LD2?
+
+# Ans:
+# LD2 is the second linear discriminant component.
+# It provides another direction for class separation.
+
+
+# Q11. Why is StandardScaler used?
+
+# Ans:
+# It standardizes the input features so that their
+# mean is approximately zero and standard deviation is one.
+
+
+# Q12. What is the difference between fit() and transform()?
+
+# Ans:
+# fit() learns the required parameters from
